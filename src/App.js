@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {
   getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword , sendEmailVerification ,sendPasswordResetEmail } from "firebase/auth";
+  signInWithEmailAndPassword , sendEmailVerification ,sendPasswordResetEmail,updateProfile } from "firebase/auth";
 import initializeAuthentication from './Firebase/firebase.init';
 import { useState } from 'react';
 
@@ -23,7 +23,7 @@ function App() {
 
   // }
 
-
+  const [name , setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -36,6 +36,11 @@ function App() {
   const toggleIsLogin = (event) => {
     setIsLogin(event.target.checked)
   }
+
+//taking name from name field
+const handleName = (event) => {
+  setName(event.target.value)
+}
 
   // taking input from email field
   const handleEmail = (event) => {
@@ -81,6 +86,8 @@ function App() {
 
         // second email verification whether it is a valid email address or not 
         verifyEmail();
+        // store the name into firebase during registration and display that name after login from firebase  
+        setUserName();
       })
       .catch(error => {
         setError(error.message);
@@ -113,6 +120,11 @@ const verifyEmail = () => {
 
 } 
 
+const setUserName = () =>{
+updateProfile ( auth.currentUser , { displayName : name})
+.then( result => {})
+}
+
 const handleResetPassword = () =>{
   sendPasswordResetEmail(auth, email)
   .then(result =>{
@@ -125,6 +137,14 @@ const handleResetPassword = () =>{
     <div className="mx-5 mt-5 w-50">
       <h3 className="text-primary mb-5">PLease {isLogin ? 'Login' : 'Register'}</h3>
       <form onSubmit={handleRegistration}>
+      {/* name field will be visible only in registration */}
+      { !isLogin && <div className="row mb-3">
+          <label htmlFor="inputName" className="col-sm-2 col-form-label">Name</label>
+          <div className="col-sm-10">
+            <input type="name" onBlur={handleName} className="form-control" id="name" required />
+          </div>
+        </div> }
+
 
         <div className="row mb-3">
           <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">Email</label>
